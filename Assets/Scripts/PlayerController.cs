@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public GameObject travelDistance;
-    public Collider planeCollider;
     public Vector3 movementLimits;
+    public SpawnManager spawnManager;
 
     // Start is called before the first frame update
     void Start()
     {
+        spawnManager = FindObjectOfType<SpawnManager>();
     }
 
     // Update is called once per frame
@@ -59,6 +59,16 @@ public class PlayerController : MonoBehaviour
         else if(transform.position.z < -movementLimits.z)
         {
             transform.position += Vector3.forward;
+        }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log("Enemy hit");
+            Destroy(collision.gameObject);
+            spawnManager.numberOfEnemies--;
         }
     }
 }

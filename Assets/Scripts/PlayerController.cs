@@ -7,7 +7,11 @@ public class PlayerController : MonoBehaviour
     public Vector3 movementLimits;
     public SpawnManager spawnManager;
 
+    // Stat reenergy
+    private readonly float maxEnergy = 20;
+    // Player stats
     private float energy = 20;
+
     // Used to handle different movement types
     private KeyCode currentKey;
     private readonly float timeInterval = 0.1f;
@@ -117,6 +121,12 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Enemy hit");
             Destroy(collision.gameObject);
             spawnManager.numberOfEnemies--;
+        }
+        else if(collision.gameObject.CompareTag("Rest Point"))
+        {
+            Debug.Log("Refreshing energy");
+            Destroy(collision.gameObject);
+            energy = maxEnergy;
         }
     }
 }

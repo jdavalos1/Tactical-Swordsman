@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     // Stat reenergy
     private readonly float maxEnergy = 20;
     // Player stats
-    private float energy = 20;
+    public float energy = 50;
 
     // Used to handle different movement types
     private KeyCode currentKey;

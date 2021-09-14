@@ -13,6 +13,10 @@ public class SpawnManager : MonoBehaviour
     public int numberOfEnemies;
     private int waveNumber = 1;
 
+    // Rest point
+    public GameObject restPointPrefab;
+    public int maxRestPoint = 1;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,6 +30,7 @@ public class SpawnManager : MonoBehaviour
         {
             CreateEnemyWaves(++waveNumber);
         }
+        
     }
 
     // Generate a position at square on the board
@@ -49,5 +54,7 @@ public class SpawnManager : MonoBehaviour
         }
 
         numberOfEnemies = enemyNumber;
+
+        Instantiate(restPointPrefab, GenerateRandomPosition(), restPointPrefab.transform.rotation);
     }
 }

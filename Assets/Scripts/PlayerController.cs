@@ -7,40 +7,80 @@ public class PlayerController : MonoBehaviour
     public Vector3 movementLimits;
     public SpawnManager spawnManager;
 
+    private float energy = 20;
+    // Used to handle different movement types
+    private KeyCode currentKey;
+    private readonly float timeInterval = 0.1f;
+    private float timeCounter = 0;
+
     // Start is called before the first frame update
     void Start()
     {
         spawnManager = FindObjectOfType<SpawnManager>();
+        currentKey = KeyCode.None;
     }
 
     // Update is called once per frame
     void Update()
     {
-        HandlePlayerMovement();
+        HandleMovement();
         CheckBoundaries();
+        CheckStats();
     }
     
-    // Handle the players lateral movements
-    void HandlePlayerMovement()
+    // Handle the player movement
+    void HandleMovement()
     {
-        // Player movement is done on a square by square movement
-        if (Input.GetKeyDown(KeyCode.W))
+        // Handle the keyboard input
+        if (currentKey == KeyCode.None)
         {
-            transform.position += Vector3.forward;
+            if (Input.GetKeyDown(KeyCode.W)) currentKey = KeyCode.W;
+            else if (Input.GetKeyDown(KeyCode.S)) currentKey = KeyCode.S;
+            else if (Input.GetKeyDown(KeyCode.A)) currentKey = KeyCode.A;
+            else if (Input.GetKeyDown(KeyCode.D)) currentKey = KeyCode.D;
         }
-        else if (Input.GetKeyDown(KeyCode.S))
+        else
         {
-            transform.position += Vector3.back;
-        }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            transform.position += Vector3.left;
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            transform.position += Vector3.right;
+            if(Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) ||
+               Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
+            {
+                currentKey = KeyCode.None;
+            }
+
+            // Handle if the a certain time frame has passed to move
+            if(timeCounter >= timeInterval)
+            {
+                switch (currentKey)
+                {
+                    case KeyCode.W:
+                        transform.position += Vector3.forward;
+                        energy--;
+                        break;
+                    case KeyCode.S:
+                        transform.position += Vector3.back;
+                        energy--;
+                        break;
+                    case KeyCode.A:
+                        transform.position += Vector3.left;
+                        energy--;
+                        break;
+                    case KeyCode.D:
+                        transform.position += Vector3.right;
+                        energy--;
+                        break;
+                    default:
+                        break;
+                }
+                // Reset the counter
+                timeCounter = 0;
+            }
+            else
+            {
+                timeCounter += Time.deltaTime;
+            }
         }
     }
+
     void CheckBoundaries()
     {
         // If the player ever gets past the boundaries return it by one block
@@ -59,6 +99,14 @@ public class PlayerController : MonoBehaviour
         else if(transform.position.z < -movementLimits.z)
         {
             transform.position += Vector3.forward;
+        }
+    }
+
+    void CheckStats()
+    {
+        if(energy <= 0)
+        {
+            Debug.Log("Game over");
         }
     }
 

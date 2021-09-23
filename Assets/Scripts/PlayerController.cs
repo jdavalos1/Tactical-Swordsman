@@ -8,9 +8,9 @@ public class PlayerController : MonoBehaviour
     public SpawnManager spawnManager;
 
     // Stat reenergy
-    private readonly float maxEnergy = 20;
+    public float maxEnergy;
     // Player stats
-    public float energy = 50;
+    public float energy;
 
     // Used to handle different movement types
     private KeyCode currentKey;
@@ -31,17 +31,33 @@ public class PlayerController : MonoBehaviour
         CheckBoundaries();
         CheckStats();
     }
-    
-    // Handle the player movement
+
+     // Handle the player movement
     void HandleMovement()
     {
-        // Handle the keyboard input
+        // Handle the keyboard input.
         if (currentKey == KeyCode.None)
         {
-            if (Input.GetKeyDown(KeyCode.W)) currentKey = KeyCode.W;
-            else if (Input.GetKeyDown(KeyCode.S)) currentKey = KeyCode.S;
-            else if (Input.GetKeyDown(KeyCode.A)) currentKey = KeyCode.A;
-            else if (Input.GetKeyDown(KeyCode.D)) currentKey = KeyCode.D;
+            // Euler angles must be set for the rotation depending on the key
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                currentKey = KeyCode.W;
+                transform.rotation = Quaternion.Euler(0, 0, 0);
+            }
+            else if (Input.GetKeyDown(KeyCode.S))
+            {
+                currentKey = KeyCode.S;
+                transform.rotation = Quaternion.Euler(0, 180, 0);
+            }
+            else if (Input.GetKeyDown(KeyCode.A))
+            {
+                currentKey = KeyCode.A;
+                transform.rotation = Quaternion.Euler(0, 270, 0);
+            }
+            else if (Input.GetKeyDown(KeyCode.D)) {
+                currentKey = KeyCode.D;
+                transform.rotation = Quaternion.Euler(0, 90, 0);
+            }
         }
         else
         {

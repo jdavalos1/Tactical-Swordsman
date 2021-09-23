@@ -4,8 +4,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    private bool s = false;
     public Vector3 movementLimits;
     public SpawnManager spawnManager;
+
+    // Player movement tracking
+    public Queue<Quaternion> playerRot;
 
     // Stat reenergy
     public float maxEnergy;
@@ -20,6 +24,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        playerRot = new Queue<Quaternion>();
         spawnManager = FindObjectOfType<SpawnManager>();
         currentKey = KeyCode.None;
     }
@@ -27,101 +32,86 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        HandleMovement();
+        HandeMovement();
         CheckBoundaries();
         CheckStats();
     }
 
-     // Handle the player movement
-    void HandleMovement()
+    void HandeMovement()
     {
-        // Handle the keyboard input.
-        if (currentKey == KeyCode.None)
-        {
-            // Euler angles must be set for the rotation depending on the key
-            if (Input.GetKeyDown(KeyCode.W))
-            {
-                currentKey = KeyCode.W;
-                transform.rotation = Quaternion.Euler(0, 0, 0);
-            }
-            else if (Input.GetKeyDown(KeyCode.S))
-            {
-                currentKey = KeyCode.S;
-                transform.rotation = Quaternion.Euler(0, 180, 0);
-            }
-            else if (Input.GetKeyDown(KeyCode.A))
-            {
-                currentKey = KeyCode.A;
-                transform.rotation = Quaternion.Euler(0, 270, 0);
-            }
-            else if (Input.GetKeyDown(KeyCode.D)) {
-                currentKey = KeyCode.D;
-                transform.rotation = Quaternion.Euler(0, 90, 0);
-            }
-        }
-        else
-        {
-            if(Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) ||
-               Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
-            {
-                currentKey = KeyCode.None;
-            }
+        // Handle the key presses when they're set
+        if (Input.GetKeyDown(KeyCode.W)) SetKeyDown(KeyCode.W);
+        else if (Input.GetKeyDown(KeyCode.S)) SetKeyDown(KeyCode.S);
+        else if (Input.GetKeyDown(KeyCode.A)) SetKeyDown(KeyCode.A);
+        else if (Input.GetKeyDown(KeyCode.D)) SetKeyDown(KeyCode.D);
 
-            // Handle if the a certain time frame has passed to move
-            if(timeCounter >= timeInterval)
+        // If the player has stopped moving don't track movement
+        if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) ||
+           Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
+        {
+            s = false;
+        }
+
+        // If there's still movement and the counter > time interval
+        if (s && timeCounter >= timeInterval)
+        {
+            switch (currentKey)
             {
-                switch (currentKey)
-                {
-                    case KeyCode.W:
-                        transform.position += Vector3.forward;
-                        energy--;
-                        break;
-                    case KeyCode.S:
-                        transform.position += Vector3.back;
-                        energy--;
-                        break;
-                    case KeyCode.A:
-                        transform.position += Vector3.left;
-                        energy--;
-                        break;
-                    case KeyCode.D:
-                        transform.position += Vector3.right;
-                        energy--;
-                        break;
-                    default:
-                        break;
-                }
-                // Reset the counter
-                timeCounter = 0;
+                case KeyCode.W:
+                    QueueMovement(new Vector3(0, 0, 0));
+                    break;
+                case KeyCode.S:
+                    QueueMovement(new Vector3(0, 180, 0));
+                    break;
+                case KeyCode.A:
+                    QueueMovement(new Vector3(0, 270, 0));
+                    break;
+                case KeyCode.D:
+                    QueueMovement(new Vector3(0, 90, 0));
+                    break;
+                default:
+                    break;
             }
-            else
-            {
-                timeCounter += Time.deltaTime;
-            }
+            // Reset the counter
+            timeCounter = 0;
+        }
+
+        // If we're still moving, track the input counter else void it
+        if (s) timeCounter += Time.deltaTime;
+        else timeCounter = 0;
+    }
+
+    // Just a setter function for the current key
+    private void SetKeyDown(KeyCode k)
+    {
+        currentKey = k;
+        s = true;
+    }
+
+    // Queue up the rotation of the players movement and move the player
+    private void QueueMovement(Vector3 rot)
+    {
+        transform.rotation = Quaternion.Euler(rot);
+        playerRot.Enqueue(transform.rotation);
+        
+        transform.position += transform.forward;
+        energy--;
+    }
+
+    // Check if the player is attempting to go beyond the x and z axis
+    private void CheckBoundaries()
+    {
+        Vector3 playerPos = transform.position;
+        
+        if((playerPos.x > movementLimits.x || playerPos.x < -movementLimits.x) ||
+           (playerPos.z > movementLimits.z || playerPos.z < -movementLimits.z))
+        {
+            transform.position -= transform.forward;
         }
     }
 
-    void CheckBoundaries()
-    {
-        // If the player ever gets past the boundaries return it by one block
-        if(transform.position.x > movementLimits.x)
-        {
-            transform.position += Vector3.left;
-        }
-        else if(transform.position.x < -movementLimits.x)
-        {
-            transform.position += Vector3.right;
-        }
-        if(transform.position.z > movementLimits.z)
-        {
-            transform.position += Vector3.back;
-        }
-        else if(transform.position.z < -movementLimits.z)
-        {
-            transform.position += Vector3.forward;
-        }
-    }
 
+    // Check if the player has no energy
     void CheckStats()
     {
         if(energy <= 0)
@@ -130,6 +120,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // What the heck are we hitting?
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Enemy"))

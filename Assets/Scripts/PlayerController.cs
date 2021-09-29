@@ -99,6 +99,9 @@ public class PlayerController : MonoBehaviour
             solidPlayer.transform.position = Vector3.Lerp(originalPosition, nextPosition, fractionOfJourney);
             yield return new WaitForSeconds(0.005f);
             dist = Vector3.Distance(solidPlayer.transform.position, nextPosition);
+            Debug.Log($"Solid Player Position: {solidPlayer.transform.position}");
+            Debug.Log($"Next Position: {nextPosition}");
+            Debug.Log($"Distance Covered: {dist}");
         }
     }
 

@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    // Limits in the x y and z direction for player movement
     public Vector3 movementLimits;
+    // Spawn manager to reduce enemies on screen
     private SpawnManager spawnManager;
+
     // Note: The player prefab will be moved after pressing enter
     [SerializeField] GameObject transparentPlayer;
     [SerializeField] GameObject solidPlayer;
@@ -97,11 +100,8 @@ public class PlayerController : MonoBehaviour
             float fractionOfJourney = distCovered / journeyLength;
             // Lerp over time and wait 0.005 secs before lerping again
             solidPlayer.transform.position = Vector3.Lerp(originalPosition, nextPosition, fractionOfJourney);
-            yield return new WaitForSeconds(0.005f);
+            yield return new WaitForSeconds(0.001f);
             dist = Vector3.Distance(solidPlayer.transform.position, nextPosition);
-            Debug.Log($"Solid Player Position: {solidPlayer.transform.position}");
-            Debug.Log($"Next Position: {nextPosition}");
-            Debug.Log($"Distance Covered: {dist}");
         }
     }
 
@@ -109,11 +109,9 @@ public class PlayerController : MonoBehaviour
     void HandleTransparentShow()
     {
         // Get the distance between the transparent and solid player
-        float dist = Vector3.Distance(transparentPlayer.transform.position, solidPlayer.transform.position);
-
         // Set the player active if the distance is 0
-        transparentPlayer.SetActive(false);
-        if (dist > 0) transparentPlayer.SetActive(true);
+        //transparentPlayer.SetActive(false);
+        //if (dist > 0.01f) transparentPlayer.SetActive(true);
     }
 
     void HandleMovement()

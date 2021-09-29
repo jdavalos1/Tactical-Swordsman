@@ -5,18 +5,28 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public Vector3 movementLimits;
-    public SpawnManager spawnManager;
+    private SpawnManager spawnManager;
     // Note: The player prefab will be moved after pressing enter
-    private Vector3 originalLocation;
+    [SerializeField] GameObject transparentPlayer;
+    [SerializeField] GameObject solidPlayer;
+    [SerializeField] FollowPlayer followPlayerScript;
 
     // Player movement tracking
-    public Queue<Quaternion> playerRot;
-    private bool isMoving = false;
+    private bool playerIsMoving = false;
+    private Queue<Quaternion> playerRot;
+
+    // Moving solid information
+    [SerializeField] float solidPlayerMoveSpeed = 5;
+    private float journeyLength;
+    private float startTime;
+    private bool solidIsMoving = false;
+    private Vector3 originalPosition;
+    private Vector3 nextPosition;
 
     // Stat reenergy
-    public float maxEnergy;
+    [SerializeField] float maxEnergy;
     // Player stats
-    public float energy;
+    private float energy = 100;
 
     // Used to handle different movement types
     private KeyCode currentKey;
@@ -26,30 +36,81 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        followPlayerScript = Camera.main.GetComponent<FollowPlayer>(); 
         playerRot = new Queue<Quaternion>();
         spawnManager = FindObjectOfType<SpawnManager>();
         currentKey = KeyCode.None;
-        originalLocation = transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (playerRot.Count != 0 && Input.GetKeyDown(KeyCode.Space))
+        // If we hit space then start moving
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            Debug.Log("Time to move");
-            transform.position = originalLocation;
+            followPlayerScript.player = solidPlayer;
+            solidIsMoving = true;
+            StartCoroutine(Traverse());
         }
 
-        HandleMovement();
-        CheckBoundaries();
-        CheckStats();
-    }
-    void Traverse()
-    {
-        foreach(var rot in playerRot)
+        // Is the translucent allowed to move or the solid?
+        if (!solidIsMoving)
         {
+            HandleTransparentShow();
+            HandleMovement();
+            CheckBoundaries();
+            CheckStats();
         }
+    }
+
+    IEnumerator Traverse()
+    {
+        solidPlayer.GetComponent<Animator>().SetBool("Run_b", true);
+        // Iterate through the queue
+        while(playerRot.Count > 0)
+        {
+            // Rotate the solid player first
+            solidPlayer.transform.rotation = playerRot.Dequeue();
+            // Obtain the next position and the length needed
+            nextPosition = solidPlayer.transform.position + solidPlayer.transform.forward;
+            journeyLength = Vector3.Distance(solidPlayer.transform.position, nextPosition);
+            startTime = Time.time;
+            // The starting position obtained
+            originalPosition = solidPlayer.transform.position;
+            // let the object move forward
+            yield return StartCoroutine(MoveForward());
+        }
+        solidIsMoving = false;
+        followPlayerScript.player = transparentPlayer;
+        solidPlayer.GetComponent<Animator>().SetBool("Run_b", false);
+    }
+
+    IEnumerator MoveForward()
+    {
+        float dist = Vector3.Distance(solidPlayer.transform.position, nextPosition);
+        // While the object can still traverse 
+        while ( dist > 0)
+        {
+            // Get the distance covered from the beginning of the movement
+            float distCovered = (Time.time - startTime) * solidPlayerMoveSpeed;
+            // Get the current fraction of the journey
+            float fractionOfJourney = distCovered / journeyLength;
+            // Lerp over time and wait 0.005 secs before lerping again
+            solidPlayer.transform.position = Vector3.Lerp(originalPosition, nextPosition, fractionOfJourney);
+            yield return new WaitForSeconds(0.005f);
+            dist = Vector3.Distance(solidPlayer.transform.position, nextPosition);
+        }
+    }
+
+    // Handle whether or not the transparent version should be seen
+    void HandleTransparentShow()
+    {
+        // Get the distance between the transparent and solid player
+        float dist = Vector3.Distance(transparentPlayer.transform.position, solidPlayer.transform.position);
+
+        // Set the player active if the distance is 0
+        transparentPlayer.SetActive(false);
+        if (dist > 0) transparentPlayer.SetActive(true);
     }
 
     void HandleMovement()
@@ -64,11 +125,11 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) ||
            Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
         {
-            isMoving = false;
+            playerIsMoving = false;
         }
 
         // If there's still movement and the counter > time interval
-        if (isMoving && timeCounter >= timeInterval)
+        if (playerIsMoving && timeCounter >= timeInterval)
         {
             switch (currentKey)
             {
@@ -92,7 +153,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // If we're still moving, track the input counter else void it
-        if (isMoving) timeCounter += Time.deltaTime;
+        if (playerIsMoving) timeCounter += Time.deltaTime;
         else timeCounter = 0;
     }
 
@@ -100,28 +161,31 @@ public class PlayerController : MonoBehaviour
     private void SetKeyDown(KeyCode k)
     {
         currentKey = k;
-        isMoving = true;
+        playerIsMoving = true;
     }
 
     // Queue up the rotation of the players movement and move the player
     private void QueueMovement(Vector3 rot)
     {
-        transform.rotation = Quaternion.Euler(rot);
-        playerRot.Enqueue(transform.rotation);
+        transparentPlayer.transform.rotation = Quaternion.Euler(rot);
+        playerRot.Enqueue(transparentPlayer.transform.rotation);
 
-        transform.position += transform.forward;
+        transparentPlayer.transform.position += transparentPlayer.transform.forward;
         energy--;
     }
+
 
     // Check if the player is attempting to go beyond the x and z axis
     private void CheckBoundaries()
     {
-        Vector3 playerPos = transform.position;
+        Vector3 playerPos = transparentPlayer.transform.position;
         
         if((playerPos.x > movementLimits.x || playerPos.x < -movementLimits.x) ||
            (playerPos.z > movementLimits.z || playerPos.z < -movementLimits.z))
         {
-            transform.position -= transform.forward;
+            playerRot.Dequeue();
+            energy++;
+            transparentPlayer.transform.position -= transparentPlayer.transform.forward;
         }
     }
 

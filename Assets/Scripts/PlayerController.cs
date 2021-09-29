@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private bool s = false;
     public Vector3 movementLimits;
     public SpawnManager spawnManager;
+    // Note: The player prefab will be moved after pressing enter
+    private Vector3 originalLocation;
 
     // Player movement tracking
     public Queue<Quaternion> playerRot;
+    private bool isMoving = false;
 
     // Stat reenergy
     public float maxEnergy;
@@ -27,17 +29,30 @@ public class PlayerController : MonoBehaviour
         playerRot = new Queue<Quaternion>();
         spawnManager = FindObjectOfType<SpawnManager>();
         currentKey = KeyCode.None;
+        originalLocation = transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
-        HandeMovement();
+        if (playerRot.Count != 0 && Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log("Time to move");
+            transform.position = originalLocation;
+        }
+
+        HandleMovement();
         CheckBoundaries();
         CheckStats();
     }
+    void Traverse()
+    {
+        foreach(var rot in playerRot)
+        {
+        }
+    }
 
-    void HandeMovement()
+    void HandleMovement()
     {
         // Handle the key presses when they're set
         if (Input.GetKeyDown(KeyCode.W)) SetKeyDown(KeyCode.W);
@@ -49,11 +64,11 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) ||
            Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
         {
-            s = false;
+            isMoving = false;
         }
 
         // If there's still movement and the counter > time interval
-        if (s && timeCounter >= timeInterval)
+        if (isMoving && timeCounter >= timeInterval)
         {
             switch (currentKey)
             {
@@ -77,7 +92,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // If we're still moving, track the input counter else void it
-        if (s) timeCounter += Time.deltaTime;
+        if (isMoving) timeCounter += Time.deltaTime;
         else timeCounter = 0;
     }
 
@@ -85,7 +100,7 @@ public class PlayerController : MonoBehaviour
     private void SetKeyDown(KeyCode k)
     {
         currentKey = k;
-        s = true;
+        isMoving = true;
     }
 
     // Queue up the rotation of the players movement and move the player
@@ -93,7 +108,7 @@ public class PlayerController : MonoBehaviour
     {
         transform.rotation = Quaternion.Euler(rot);
         playerRot.Enqueue(transform.rotation);
-        
+
         transform.position += transform.forward;
         energy--;
     }

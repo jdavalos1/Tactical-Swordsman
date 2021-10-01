@@ -10,9 +10,10 @@ public class PlayerController : MonoBehaviour
     private SpawnManager spawnManager;
 
     // Note: The player prefab will be moved after pressing enter
-    [SerializeField] GameObject transparentPlayer;
+    [SerializeField] GameObject transparentPlayerPrefab;
     [SerializeField] GameObject solidPlayer;
     [SerializeField] FollowPlayer followPlayerScript;
+    private GameObject transparentPlayer;
 
     // Player movement tracking
     private bool playerIsMoving = false;
@@ -53,19 +54,28 @@ public class PlayerController : MonoBehaviour
         {
             followPlayerScript.player = solidPlayer;
             solidIsMoving = true;
+            if (transparentPlayer != null)
+            {
+                Destroy(transparentPlayer);
+            }
+
             StartCoroutine(Traverse());
         }
 
         // Is the translucent allowed to move or the solid?
         if (!solidIsMoving)
         {
-            HandleTransparentShow();
             HandleMovement();
             CheckBoundaries();
             CheckStats();
         }
     }
 
+
+    /// <summary>
+    /// Traverse based on the rotations handled
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Traverse()
     {
         solidPlayer.GetComponent<Animator>().SetBool("Run_b", true);
@@ -88,6 +98,10 @@ public class PlayerController : MonoBehaviour
         solidPlayer.GetComponent<Animator>().SetBool("Run_b", false);
     }
 
+    /// <summary>
+    /// Moves a unit vector forward
+    /// </summary>
+    /// <returns></returns>
     IEnumerator MoveForward()
     {
         float dist = Vector3.Distance(solidPlayer.transform.position, nextPosition);
@@ -103,15 +117,6 @@ public class PlayerController : MonoBehaviour
             yield return new WaitForSeconds(0.001f);
             dist = Vector3.Distance(solidPlayer.transform.position, nextPosition);
         }
-    }
-
-    // Handle whether or not the transparent version should be seen
-    void HandleTransparentShow()
-    {
-        // Get the distance between the transparent and solid player
-        // Set the player active if the distance is 0
-        //transparentPlayer.SetActive(false);
-        //if (dist > 0.01f) transparentPlayer.SetActive(true);
     }
 
     void HandleMovement()
@@ -168,6 +173,12 @@ public class PlayerController : MonoBehaviour
     // Queue up the rotation of the players movement and move the player
     private void QueueMovement(Vector3 rot)
     {
+        if(playerRot.Count == 0 && transparentPlayer == null)
+        {
+            transparentPlayer = Instantiate(transparentPlayerPrefab, solidPlayer.transform.position, solidPlayer.transform.rotation);
+            followPlayerScript.player = transparentPlayer;
+        }
+
         transparentPlayer.transform.rotation = Quaternion.Euler(rot);
         playerRot.Enqueue(transparentPlayer.transform.rotation);
 
@@ -179,6 +190,7 @@ public class PlayerController : MonoBehaviour
     // Check if the player is attempting to go beyond the x and z axis
     private void CheckBoundaries()
     {
+        if (transparentPlayer == null) return;
         Vector3 playerPos = transparentPlayer.transform.position;
         
         if((playerPos.x > movementLimits.x || playerPos.x < -movementLimits.x) ||

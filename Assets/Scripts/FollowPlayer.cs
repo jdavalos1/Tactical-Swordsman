@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class FollowPlayer : MonoBehaviour
 {
-    public float lerpSpeed = 5.0f;
+    [Min(0)]
+    [SerializeField] float lerpSpeed;
     public GameObject player;
-    public Vector3 offset;
+    [SerializeField] Vector3 offset;
 
     // Start is called before the first frame update
     void Start()
@@ -16,7 +17,7 @@ public class FollowPlayer : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        LerpCamera();
+        if(player != null) LerpCamera();
     }
 
     void LerpCamera()

@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     // Note: The player prefab will be moved after pressing enter
     [SerializeField] GameObject transparentPlayerPrefab;
     [SerializeField] GameObject solidPlayer;
-    [SerializeField] FollowPlayer followPlayerScript;
+    private FollowPlayer followPlayerScript;
     private GameObject transparentPlayer;
 
     // Player movement tracking
@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     private Queue<Quaternion> playerRot;
 
     // Moving solid information
-    [SerializeField] float solidPlayerMoveSpeed = 5;
+    [SerializeField] float solidPlayerMoveSpeed;
     private float journeyLength;
     private float startTime;
     private bool solidIsMoving = false;
@@ -212,20 +212,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // What the heck are we hitting?
-    void OnCollisionEnter(Collision collision)
+    // Just used to not expose the max energy and energy fields
+    public void ResetEnergy()
     {
-        if (collision.gameObject.CompareTag("Enemy"))
-        {
-            Debug.Log("Enemy hit");
-            Destroy(collision.gameObject);
-            spawnManager.numberOfEnemies--;
-        }
-        else if(collision.gameObject.CompareTag("Rest Point"))
-        {
-            Debug.Log("Refreshing energy");
-            Destroy(collision.gameObject);
-            energy = maxEnergy;
-        }
+        energy = maxEnergy;
     }
+
 }

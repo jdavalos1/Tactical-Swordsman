@@ -131,7 +131,6 @@ MonoBehaviour:
   movementLimits: {x: 22.5, y: 0, z: 22.5}
   transparentPlayerPrefab: {fileID: 2654059462634879679, guid: c12a00688c7e8e544b8ccba5111db286, type: 3}
   solidPlayer: {fileID: 7112976485875579492}
-  followPlayerScript: {fileID: 0}
   solidPlayerMoveSpeed: 10
   maxEnergy: 100
 --- !u!1001 &1723781388077209678

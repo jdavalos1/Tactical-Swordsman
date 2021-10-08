@@ -13,19 +13,14 @@ public class SolidPlayer : MonoBehaviour
         playerController = FindObjectOfType<PlayerController>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     // What the heck are we hitting?
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
             Debug.Log("Enemy hit");
-            Destroy(collision.gameObject);
+            collision.gameObject.GetComponent<Animator>().SetBool("Death_b", true);
+            //Destroy(collision.gameObject);
             spawnManager.numberOfEnemies--;
         }
         else if(collision.gameObject.CompareTag("Rest Point"))

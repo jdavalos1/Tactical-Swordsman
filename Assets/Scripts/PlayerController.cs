@@ -28,9 +28,9 @@ public class PlayerController : MonoBehaviour
     private Vector3 nextPosition;
 
     // Stat reenergy
-    [SerializeField] float maxEnergy;
+    [SerializeField] float allowedMovement;
     // Player stats
-    private float energy = 100;
+    private float movementTraversed;
 
     // Used to handle different movement types
     private KeyCode currentKey;
@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        movementTraversed = 0;
         followPlayerScript = Camera.main.GetComponent<FollowPlayer>(); 
         playerRot = new Queue<Quaternion>();
         spawnManager = FindObjectOfType<SpawnManager>();
@@ -67,7 +68,7 @@ public class PlayerController : MonoBehaviour
         {
             HandleMovement();
             CheckBoundaries();
-            CheckStats();
+            //CheckStats();
         }
     }
 
@@ -93,6 +94,7 @@ public class PlayerController : MonoBehaviour
             // let the object move forward
             yield return StartCoroutine(MoveForward());
         }
+        movementTraversed = 0;
         solidIsMoving = false;
         followPlayerScript.player = transparentPlayer;
         solidPlayer.GetComponent<Animator>().SetBool("Run_b", false);
@@ -179,11 +181,13 @@ public class PlayerController : MonoBehaviour
             followPlayerScript.player = transparentPlayer;
         }
 
-        transparentPlayer.transform.rotation = Quaternion.Euler(rot);
-        playerRot.Enqueue(transparentPlayer.transform.rotation);
-
-        transparentPlayer.transform.position += transparentPlayer.transform.forward;
-        energy--;
+        if (movementTraversed < allowedMovement)
+        {
+            movementTraversed++;
+            transparentPlayer.transform.rotation = Quaternion.Euler(rot);
+            playerRot.Enqueue(transparentPlayer.transform.rotation);
+            transparentPlayer.transform.position += transparentPlayer.transform.forward;
+        }
     }
 
 
@@ -197,7 +201,7 @@ public class PlayerController : MonoBehaviour
            (playerPos.z > movementLimits.z || playerPos.z < -movementLimits.z))
         {
             playerRot.Dequeue();
-            energy++;
+            movementTraversed--;
             transparentPlayer.transform.position -= transparentPlayer.transform.forward;
         }
     }
@@ -206,7 +210,7 @@ public class PlayerController : MonoBehaviour
     // Check if the player has no energy
     void CheckStats()
     {
-        if(energy <= 0)
+        if(movementTraversed <= 0)
         {
             Debug.Log("Game over");
         }
@@ -215,7 +219,6 @@ public class PlayerController : MonoBehaviour
     // Just used to not expose the max energy and energy fields
     public void ResetEnergy()
     {
-        energy = maxEnergy;
+        movementTraversed = allowedMovement;
     }
-
 }

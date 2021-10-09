@@ -27,10 +27,13 @@ public class PlayerController : MonoBehaviour
     private Vector3 originalPosition;
     private Vector3 nextPosition;
 
-    // Stat reenergy
-    [SerializeField] float allowedMovement;
     // Player stats
+    private float currentEnergy;
     private float movementTraversed;
+
+    // Player maximums
+    [SerializeField] float maximumEnergy;
+    [SerializeField] float allowedMovement;
 
     // Used to handle different movement types
     private KeyCode currentKey;
@@ -50,19 +53,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // If we hit space then start moving
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            followPlayerScript.player = solidPlayer;
-            solidIsMoving = true;
-            if (transparentPlayer != null)
-            {
-                Destroy(transparentPlayer);
-            }
-
-            StartCoroutine(Traverse());
-        }
-
+        HandleSolidMovement();
         // Is the translucent allowed to move or the solid?
         if (!solidIsMoving)
         {
@@ -118,6 +109,23 @@ public class PlayerController : MonoBehaviour
             solidPlayer.transform.position = Vector3.Lerp(originalPosition, nextPosition, fractionOfJourney);
             yield return new WaitForSeconds(0.001f);
             dist = Vector3.Distance(solidPlayer.transform.position, nextPosition);
+        }
+    }
+
+    void HandleSolidMovement()
+    {
+        // If we hit space then start moving
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            followPlayerScript.player = solidPlayer;
+            solidIsMoving = true;
+            currentKey = KeyCode.None;
+            if (transparentPlayer != null)
+            {
+                Destroy(transparentPlayer);
+            }
+
+            StartCoroutine(Traverse());
         }
     }
 
@@ -219,6 +227,7 @@ public class PlayerController : MonoBehaviour
     // Just used to not expose the max energy and energy fields
     public void ResetEnergy()
     {
+        currentEnergy = maximumEnergy;
         movementTraversed = allowedMovement;
     }
 }

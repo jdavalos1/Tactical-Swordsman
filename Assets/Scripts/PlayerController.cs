@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -32,16 +33,19 @@ public class PlayerController : MonoBehaviour
     // Player stats
     private float currentEnergy;
     private float movementTraversed;
-    [SerializeField] Slider energySlider;
 
     // Player maximums
     [SerializeField] float maximumEnergy;
-    [SerializeField] float allowedMovement;
+    [SerializeField] int allowedMovement;
 
     // Used to handle different movement types
     private KeyCode currentKey;
     private readonly float timeInterval = 0.1f;
     private float timeCounter = 0;
+
+    // UI Attributes
+    [SerializeField] TextMeshProUGUI movementText;
+    [SerializeField] Slider energySlider;
 
     // Start is called before the first frame update
     void Start()
@@ -49,7 +53,6 @@ public class PlayerController : MonoBehaviour
         // Set up stats
         movementTraversed = 0;
         currentKey = KeyCode.None;
-        energySlider.maxValue = maximumEnergy;
         currentEnergy = maximumEnergy;
 
         // Set up movement vars
@@ -59,6 +62,10 @@ public class PlayerController : MonoBehaviour
 
         // Set up managers
         gameManager = FindObjectOfType<GameManager>();
+
+        // Set up UI
+        energySlider.maxValue = maximumEnergy;
+        movementText.text = allowedMovement.ToString();
     }
 
     // Update is called once per frame

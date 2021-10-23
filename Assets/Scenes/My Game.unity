@@ -886,7 +886,7 @@ GameObject:
   - component: {fileID: 210462991}
   - component: {fileID: 210462990}
   m_Layer: 5
-  m_Name: Fill
+  m_Name: Current Energy Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3132,7 +3132,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 8
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 570821af6fea44af1be9861c4a496950, type: 2}
   m_sharedMaterial: {fileID: 21855137469139786, guid: 570821af6fea44af1be9861c4a496950, type: 2}
@@ -5586,6 +5586,10 @@ PrefabInstance:
       propertyPath: energySlider
       value: 
       objectReference: {fileID: 584172912}
+    - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
+      propertyPath: movementText
+      value: 
+      objectReference: {fileID: 951368444}
     - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
       propertyPath: maximumEnergy
       value: 100

@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    // Game Manager to see if we can do anything
+    GameManager gameManager;
     // Limits in the x y and z direction for player movement
     public Vector3 movementLimits;
-    // Spawn manager to reduce enemies on screen
-    private SpawnManager spawnManager;
 
     // Note: The player prefab will be moved after pressing space 
     [SerializeField] GameObject transparentPlayerPrefab;
@@ -26,10 +27,12 @@ public class PlayerController : MonoBehaviour
     private bool solidIsMoving = false;
     private Vector3 originalPosition;
     private Animator solidPlayerAnimator;
+    Coroutine traversalCoroutine;
 
     // Player stats
     private float currentEnergy;
     private float movementTraversed;
+    [SerializeField] Slider energySlider;
 
     // Player maximums
     [SerializeField] float maximumEnergy;
@@ -43,26 +46,35 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Set up stats
         movementTraversed = 0;
         currentKey = KeyCode.None;
+        energySlider.maxValue = maximumEnergy;
         currentEnergy = maximumEnergy;
+
+        // Set up movement vars
         playerRot = new Queue<Quaternion>();
-        spawnManager = FindObjectOfType<SpawnManager>();
         solidPlayerAnimator = solidPlayer.GetComponent<Animator>();
         followPlayerScript = Camera.main.GetComponent<FollowPlayer>(); 
+
+        // Set up managers
+        gameManager = FindObjectOfType<GameManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        HandleSolidMovement();
-        CheckStats();
-        // Is the translucent allowed to move or the solid?
-        if (!solidIsMoving)
+        if (!gameManager.isGameOver)
         {
-            HandleMovement();
-            CheckBoundaries();
-            HandleEscapeKey();
+            HandleSolidMovement();
+            CheckStats();
+            // Is the translucent allowed to move or the solid?
+            if (!solidIsMoving)
+            {
+                HandleMovement();
+                CheckBoundaries();
+                HandleEscapeKey();
+            }
         }
     }
 
@@ -110,10 +122,11 @@ public class PlayerController : MonoBehaviour
             float fractionOfJourney = distCovered / journeyLength;
             // Lerp over time and wait 0.005 secs before lerping again
             solidPlayer.transform.position = Vector3.Lerp(originalPosition, nextPosition, fractionOfJourney);
-            yield return new WaitForSeconds(0.001f);
+            yield return new WaitForSeconds(0);
             dist = Vector3.Distance(solidPlayer.transform.position, nextPosition);
         }
         currentEnergy--;
+        energySlider.value = currentEnergy;
     }
 
     void HandleSolidMovement()
@@ -129,10 +142,13 @@ public class PlayerController : MonoBehaviour
                 Destroy(transparentPlayer);
             }
 
-            StartCoroutine(Traverse());
+            traversalCoroutine = StartCoroutine(Traverse());
         }
     }
 
+    /// <summary>
+    /// Removes the transparent and returns to the solid
+    /// </summary>
     void HandleEscapeKey()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -229,16 +245,18 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
     // Check if the player has no energy
     void CheckStats()
     {
-        Debug.Log($"Energy left: {currentEnergy}");
-        if(currentEnergy <= 0)
+        // Should only happen once when the energy has gone to 0
+        if (currentEnergy <= 0 && !gameManager.isGameOver)
         {
+            gameManager.isGameOver = true;
             solidPlayerAnimator.SetBool("Death_b", true);
             solidPlayerAnimator.SetBool("Run_b", false);
-            Debug.Log("Game over");
+            playerRot.Clear();
+            solidIsMoving = false;
+            if (traversalCoroutine != null) StopCoroutine(traversalCoroutine);
         }
     }
 
@@ -246,5 +264,6 @@ public class PlayerController : MonoBehaviour
     public void ResetEnergy()
     {
         currentEnergy = maximumEnergy;
+        energySlider.value = currentEnergy;
     }
 }

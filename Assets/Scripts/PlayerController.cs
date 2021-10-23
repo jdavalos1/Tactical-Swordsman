@@ -1,15 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
+    // Game Manager to see if we can do anything
+    GameManager gameManager;
     // Limits in the x y and z direction for player movement
     public Vector3 movementLimits;
-    // Spawn manager to reduce enemies on screen
-    private SpawnManager spawnManager;
 
-    // Note: The player prefab will be moved after pressing enter
+    // Note: The player prefab will be moved after pressing space 
     [SerializeField] GameObject transparentPlayerPrefab;
     [SerializeField] GameObject solidPlayer;
     private FollowPlayer followPlayerScript;
@@ -25,7 +27,8 @@ public class PlayerController : MonoBehaviour
     private float startTime;
     private bool solidIsMoving = false;
     private Vector3 originalPosition;
-    private Vector3 nextPosition;
+    private Animator solidPlayerAnimator;
+    Coroutine traversalCoroutine;
 
     // Player stats
     private float currentEnergy;
@@ -33,33 +36,52 @@ public class PlayerController : MonoBehaviour
 
     // Player maximums
     [SerializeField] float maximumEnergy;
-    [SerializeField] float allowedMovement;
+    [SerializeField] int allowedMovement;
 
     // Used to handle different movement types
     private KeyCode currentKey;
     private readonly float timeInterval = 0.1f;
     private float timeCounter = 0;
 
+    // UI Attributes
+    [SerializeField] TextMeshProUGUI movementText;
+    [SerializeField] Slider energySlider;
+
     // Start is called before the first frame update
     void Start()
     {
+        // Set up stats
         movementTraversed = 0;
-        followPlayerScript = Camera.main.GetComponent<FollowPlayer>(); 
-        playerRot = new Queue<Quaternion>();
-        spawnManager = FindObjectOfType<SpawnManager>();
         currentKey = KeyCode.None;
+        currentEnergy = maximumEnergy;
+
+        // Set up movement vars
+        playerRot = new Queue<Quaternion>();
+        solidPlayerAnimator = solidPlayer.GetComponent<Animator>();
+        followPlayerScript = Camera.main.GetComponent<FollowPlayer>(); 
+
+        // Set up managers
+        gameManager = FindObjectOfType<GameManager>();
+
+        // Set up UI
+        energySlider.maxValue = maximumEnergy;
+        movementText.text = allowedMovement.ToString();
     }
 
     // Update is called once per frame
     void Update()
     {
-        HandleSolidMovement();
-        // Is the translucent allowed to move or the solid?
-        if (!solidIsMoving)
+        if (!gameManager.isGameOver)
         {
-            HandleMovement();
-            CheckBoundaries();
-            //CheckStats();
+            HandleSolidMovement();
+            CheckStats();
+            // Is the translucent allowed to move or the solid?
+            if (!solidIsMoving)
+            {
+                HandleMovement();
+                CheckBoundaries();
+                HandleEscapeKey();
+            }
         }
     }
 
@@ -70,32 +92,32 @@ public class PlayerController : MonoBehaviour
     /// <returns></returns>
     IEnumerator Traverse()
     {
-        solidPlayer.GetComponent<Animator>().SetBool("Run_b", true);
+        solidPlayerAnimator.SetBool("Run_b", true);
         // Iterate through the queue
         while(playerRot.Count > 0)
         {
             // Rotate the solid player first
             solidPlayer.transform.rotation = playerRot.Dequeue();
             // Obtain the next position and the length needed
-            nextPosition = solidPlayer.transform.position + solidPlayer.transform.forward;
+            Vector3 nextPosition = solidPlayer.transform.position + solidPlayer.transform.forward;
             journeyLength = Vector3.Distance(solidPlayer.transform.position, nextPosition);
             startTime = Time.time;
             // The starting position obtained
             originalPosition = solidPlayer.transform.position;
             // let the object move forward
-            yield return StartCoroutine(MoveForward());
+            yield return StartCoroutine(MoveForward(nextPosition));
         }
         movementTraversed = 0;
         solidIsMoving = false;
         followPlayerScript.player = transparentPlayer;
-        solidPlayer.GetComponent<Animator>().SetBool("Run_b", false);
+        solidPlayerAnimator.SetBool("Run_b", false);
     }
 
     /// <summary>
     /// Moves a unit vector forward
     /// </summary>
     /// <returns></returns>
-    IEnumerator MoveForward()
+    IEnumerator MoveForward(Vector3 nextPosition)
     {
         float dist = Vector3.Distance(solidPlayer.transform.position, nextPosition);
         // While the object can still traverse 
@@ -107,9 +129,11 @@ public class PlayerController : MonoBehaviour
             float fractionOfJourney = distCovered / journeyLength;
             // Lerp over time and wait 0.005 secs before lerping again
             solidPlayer.transform.position = Vector3.Lerp(originalPosition, nextPosition, fractionOfJourney);
-            yield return new WaitForSeconds(0.001f);
+            yield return new WaitForSeconds(0);
             dist = Vector3.Distance(solidPlayer.transform.position, nextPosition);
         }
+        currentEnergy--;
+        energySlider.value = currentEnergy;
     }
 
     void HandleSolidMovement()
@@ -125,10 +149,24 @@ public class PlayerController : MonoBehaviour
                 Destroy(transparentPlayer);
             }
 
-            StartCoroutine(Traverse());
+            traversalCoroutine = StartCoroutine(Traverse());
         }
     }
 
+    /// <summary>
+    /// Removes the transparent and returns to the solid
+    /// </summary>
+    void HandleEscapeKey()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            followPlayerScript.player = solidPlayer;
+            currentKey = KeyCode.None;
+            movementTraversed = 0;
+            playerRot.Clear();
+            Destroy(transparentPlayer);
+        }
+    }
     void HandleMovement()
     {
         // Handle the key presses when they're set
@@ -214,13 +252,18 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
     // Check if the player has no energy
     void CheckStats()
     {
-        if(movementTraversed <= 0)
+        // Should only happen once when the energy has gone to 0
+        if (currentEnergy <= 0 && !gameManager.isGameOver)
         {
-            Debug.Log("Game over");
+            gameManager.isGameOver = true;
+            solidPlayerAnimator.SetBool("Death_b", true);
+            solidPlayerAnimator.SetBool("Run_b", false);
+            playerRot.Clear();
+            solidIsMoving = false;
+            if (traversalCoroutine != null) StopCoroutine(traversalCoroutine);
         }
     }
 
@@ -228,6 +271,6 @@ public class PlayerController : MonoBehaviour
     public void ResetEnergy()
     {
         currentEnergy = maximumEnergy;
-        movementTraversed = allowedMovement;
+        energySlider.value = currentEnergy;
     }
 }

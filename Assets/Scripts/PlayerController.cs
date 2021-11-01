@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
     // Player stats
     private float currentEnergy;
     private float movementTraversed;
+    private int killCount;
 
     // Player maximums
     [SerializeField] float maximumEnergy;
@@ -44,7 +45,7 @@ public class PlayerController : MonoBehaviour
     private float timeCounter = 0;
 
     // UI Attributes
-    [SerializeField] TextMeshProUGUI movementText;
+    [SerializeField] TextMeshProUGUI killsCountText;
     [SerializeField] Slider energySlider;
 
     // Start is called before the first frame update
@@ -65,7 +66,7 @@ public class PlayerController : MonoBehaviour
 
         // Set up UI
         energySlider.maxValue = maximumEnergy;
-        movementText.text = allowedMovement.ToString();
+        killsCountText.text = "0";
     }
 
     // Update is called once per frame
@@ -246,7 +247,7 @@ public class PlayerController : MonoBehaviour
         if((playerPos.x > movementLimits.x || playerPos.x < -movementLimits.x) ||
            (playerPos.z > movementLimits.z || playerPos.z < -movementLimits.z))
         {
-            playerRot.Dequeue();
+            if(playerRot.Count > 0) playerRot.Dequeue();
             movementTraversed--;
             transparentPlayer.transform.position -= transparentPlayer.transform.forward;
         }
@@ -272,5 +273,11 @@ public class PlayerController : MonoBehaviour
     {
         currentEnergy = maximumEnergy;
         energySlider.value = currentEnergy;
+    }
+
+    public void EnemyKilled()
+    {
+        killCount++;
+        killsCountText.text = killCount.ToString();
     }
 }

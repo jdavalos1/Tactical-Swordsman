@@ -11,22 +11,25 @@ public class SpawnManager : MonoBehaviour
 
     // Wave information
     public int numberOfEnemies;
-    private int waveNumber = 1;
+    private int waveNumber = 0;
 
     // Rest point
     public GameObject restPointPrefab;
     public int maxRestPoint = 1;
 
+    // Game Manager
+    private GameManager gameManager;
+
     // Start is called before the first frame update
     void Start()
     {
-        CreateEnemyWaves(waveNumber);
+        gameManager = FindObjectOfType<GameManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(numberOfEnemies == 0)
+        if(numberOfEnemies == 0 && !gameManager.isGameOver)
         {
             CreateEnemyWaves(++waveNumber);
         }

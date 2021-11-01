@@ -18,14 +18,12 @@ public class SolidPlayer : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            Debug.Log("Enemy hit");
             collision.gameObject.GetComponent<Animator>().SetBool("Death_b", true);
-            //Destroy(collision.gameObject);
             spawnManager.numberOfEnemies--;
+            playerController.EnemyKilled();
         }
         else if(collision.gameObject.CompareTag("Rest Point"))
         {
-            Debug.Log("Refreshing energy");
             Destroy(collision.gameObject);
             playerController.ResetEnergy();
         }

@@ -2378,6 +2378,86 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4184716620995200, guid: 543ba2233306d00479ef5713d436c12e, type: 3}
   m_PrefabInstance: {fileID: 633385151}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &636705824
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 636705825}
+  - component: {fileID: 636705826}
+  m_Layer: 0
+  m_Name: Sound Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &636705825
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 636705824}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 13
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &636705826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 636705824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b58fd0d5b43f5d54191302fb63cd210b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - clip: {fileID: 8300000, guid: cc477da07a0e95340a4e0638d3853865, type: 3}
+    _volume: 1
+    _loop: 1
+    pitch: 1
+    name: BGM
+    source: {fileID: 0}
+  - clip: {fileID: 8300000, guid: 2297347d09698b848ad3da652b4e9944, type: 3}
+    _volume: 1
+    _loop: 1
+    pitch: 1
+    name: Running_1
+    source: {fileID: 0}
+  - clip: {fileID: 8300000, guid: 8cfd47c86b81d24488795468995eae2f, type: 3}
+    _volume: 1
+    _loop: 1
+    pitch: 1
+    name: Running_2
+    source: {fileID: 0}
+  - clip: {fileID: 8300000, guid: afc81148cf88b3c48bfbd59d42bdfa91, type: 3}
+    _volume: 1
+    _loop: 1
+    pitch: 1
+    name: Running_3
+    source: {fileID: 0}
+  - clip: {fileID: 8300000, guid: d88e6bd959ff29740b3eed6ab266ea36, type: 3}
+    _volume: 1
+    _loop: 1
+    pitch: 1
+    name: Running_4
+    source: {fileID: 0}
+  - clip: {fileID: 8300000, guid: f0fba75baf76a514da1e094bc11a31be, type: 3}
+    _volume: 1
+    _loop: 1
+    pitch: 1
+    name: Running_5
+    source: {fileID: 0}
 --- !u!1001 &639788034
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6458,6 +6538,10 @@ PrefabInstance:
     - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
       propertyPath: allowedMovement
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
+      propertyPath: solidPlayerMoveSpeed
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 9086374248615857656, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
       propertyPath: m_Name

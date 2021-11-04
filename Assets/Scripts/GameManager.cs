@@ -7,21 +7,22 @@ public class GameManager : MonoBehaviour
     public bool isGameOver;
     [SerializeField] GameObject introUI;
     [SerializeField] GameObject inGameUI;
+    private SoundManager soundManager;
+
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         isGameOver = true;
+        soundManager = FindObjectOfType<SoundManager>();
     }
 
-    // Update is called once per frame
-    void Update()
+    void Start()
     {
-
+        soundManager.Play("BGM");
     }
 
     public void StartGame()
     {
-        Debug.Log("Pressed");
         isGameOver = false;
         introUI.SetActive(false);
         inGameUI.SetActive(true);

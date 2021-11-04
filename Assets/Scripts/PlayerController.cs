@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
 {
     // Game Manager to see if we can do anything
     GameManager gameManager;
+    // Sound manager for the sfx
+    SoundManager soundManager;
     // Limits in the x y and z direction for player movement
     public Vector3 movementLimits;
 
@@ -23,12 +25,13 @@ public class PlayerController : MonoBehaviour
 
     // Moving solid information
     [SerializeField] float solidPlayerMoveSpeed;
+    private float originalPlayerMoveSpeed;
     private float journeyLength;
     private float startTime;
     private bool solidIsMoving = false;
     private Vector3 originalPosition;
     private Animator solidPlayerAnimator;
-    Coroutine traversalCoroutine;
+    private Coroutine traversalCoroutine;
 
     // Player stats
     private float currentEnergy;
@@ -59,10 +62,12 @@ public class PlayerController : MonoBehaviour
         // Set up movement vars
         playerRot = new Queue<Quaternion>();
         solidPlayerAnimator = solidPlayer.GetComponent<Animator>();
-        followPlayerScript = Camera.main.GetComponent<FollowPlayer>(); 
+        followPlayerScript = Camera.main.GetComponent<FollowPlayer>();
+        originalPlayerMoveSpeed = solidPlayerMoveSpeed;
 
         // Set up managers
         gameManager = FindObjectOfType<GameManager>();
+        soundManager = FindObjectOfType<SoundManager>();
 
         // Set up UI
         energySlider.maxValue = maximumEnergy;
@@ -94,6 +99,9 @@ public class PlayerController : MonoBehaviour
     IEnumerator Traverse()
     {
         solidPlayerAnimator.SetBool("Run_b", true);
+        // Play a randomly looped running sound
+        string runningSound = $"Running_{Random.Range(0, 6)}";
+        soundManager.Play(runningSound);
         // Iterate through the queue
         while(playerRot.Count > 0)
         {
@@ -111,6 +119,7 @@ public class PlayerController : MonoBehaviour
         movementTraversed = 0;
         solidIsMoving = false;
         followPlayerScript.player = transparentPlayer;
+        soundManager.Stop(runningSound);
         solidPlayerAnimator.SetBool("Run_b", false);
     }
 
@@ -130,7 +139,7 @@ public class PlayerController : MonoBehaviour
             float fractionOfJourney = distCovered / journeyLength;
             // Lerp over time and wait 0.005 secs before lerping again
             solidPlayer.transform.position = Vector3.Lerp(originalPosition, nextPosition, fractionOfJourney);
-            yield return new WaitForSeconds(0);
+            yield return null; 
             dist = Vector3.Distance(solidPlayer.transform.position, nextPosition);
         }
         currentEnergy--;
@@ -275,9 +284,21 @@ public class PlayerController : MonoBehaviour
         energySlider.value = currentEnergy;
     }
 
-    public void EnemyKilled()
+
+    public void AttackEnemy()
     {
         killCount++;
         killsCountText.text = killCount.ToString();
+        solidPlayerMoveSpeed = 0;
+        solidPlayerAnimator.SetBool("Attack_b", true);
+        solidPlayerAnimator.SetBool("Run_b", false);
+    }
+    
+    public void ContinueRun()
+    {
+        solidPlayerMoveSpeed = originalPlayerMoveSpeed;
+        startTime = Time.time;
+        solidPlayerAnimator.SetBool("Attack_b", false);
+        solidPlayerAnimator.SetBool("Run_b", true);
     }
 }

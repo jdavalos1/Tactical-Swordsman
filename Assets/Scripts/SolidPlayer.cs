@@ -6,6 +6,13 @@ public class SolidPlayer : MonoBehaviour
 {
     private SpawnManager spawnManager;
     private PlayerController playerController;
+
+    public GameObject currentEnemyHit
+    {
+        get;
+        private set;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -18,9 +25,9 @@ public class SolidPlayer : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            collision.gameObject.GetComponent<Animator>().SetBool("Death_b", true);
+            currentEnemyHit = collision.gameObject;
             spawnManager.numberOfEnemies--;
-            playerController.EnemyKilled();
+            playerController.AttackEnemy();
         }
         else if(collision.gameObject.CompareTag("Rest Point"))
         {

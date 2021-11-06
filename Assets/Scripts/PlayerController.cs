@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
 
 public class PlayerController : MonoBehaviour
 {
@@ -87,6 +88,7 @@ public class PlayerController : MonoBehaviour
                 HandleMovement();
                 CheckBoundaries();
                 HandleEscapeKey();
+                HandleSingleReturnPress();
             }
         }
     }
@@ -144,6 +146,39 @@ public class PlayerController : MonoBehaviour
         }
         currentEnergy--;
         energySlider.value = currentEnergy;
+    }
+
+    /// <summary>
+    /// Handles if the return key has been pressed
+    /// to dequeue the last position
+    /// </summary>
+    void HandleSingleReturnPress()
+    {
+        if (Input.GetKeyDown(KeyCode.B) && playerRot.Count > 0)
+        {
+            // First remove the last movement and find out the last
+            // rotation to rotate the player to the needed position
+            var listVer = playerRot.ToList();
+            listVer.RemoveAt(listVer.Count - 1);
+
+            // If the player is not at solid location change the location
+            // else delete the transparent and start them at solid
+            if (playerRot.Count > 1)
+            {
+                transparentPlayer.transform.position -= transparentPlayer.transform.forward;
+                var secLastRot = listVer[listVer.Count - 1];
+                transparentPlayer.transform.rotation = secLastRot;
+            }
+            else
+            {
+                followPlayerScript.player = solidPlayer;
+                Destroy(transparentPlayer);
+            }
+
+            movementTraversed--;
+            currentKey = 0;
+            playerRot = new Queue<Quaternion>(listVer);
+        }
     }
 
     void HandleSolidMovement()
@@ -283,7 +318,6 @@ public class PlayerController : MonoBehaviour
         currentEnergy = maximumEnergy;
         energySlider.value = currentEnergy;
     }
-
 
     public void AttackEnemy()
     {

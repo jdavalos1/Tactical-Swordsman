@@ -8,17 +8,14 @@ public class AttackStates : StateMachineBehaviour
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         animator.SetBool("Attack_b", false);
-    }
-
-    // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    {
+        FindObjectOfType<SoundManager>().Play("Attack_1", 0.35f);
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         FindObjectOfType<SolidPlayer>().currentEnemyHit.GetComponent<Animator>().SetBool("Death_b", true);
+        FindObjectOfType<SoundManager>().Stop("Attack_1");
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()

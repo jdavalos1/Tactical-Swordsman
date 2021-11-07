@@ -102,7 +102,7 @@ public class PlayerController : MonoBehaviour
     {
         solidPlayerAnimator.SetBool("Run_b", true);
         // Play a randomly looped running sound
-        string runningSound = $"Running_{Random.Range(0, 6)}";
+        string runningSound = $"Running_1";
         soundManager.Play(runningSound);
         // Iterate through the queue
         while(playerRot.Count > 0)
@@ -156,6 +156,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.B) && playerRot.Count > 0)
         {
+            soundManager.Play("LowClick");
             // First remove the last movement and find out the last
             // rotation to rotate the player to the needed position
             var listVer = playerRot.ToList();
@@ -212,6 +213,7 @@ public class PlayerController : MonoBehaviour
             Destroy(transparentPlayer);
         }
     }
+
     void HandleMovement()
     {
         // Handle the key presses when they're set
@@ -266,6 +268,7 @@ public class PlayerController : MonoBehaviour
     // Queue up the rotation of the players movement and move the player
     private void QueueMovement(Vector3 rot)
     {
+        soundManager.Play("HighClick");
         if(playerRot.Count == 0 && transparentPlayer == null)
         {
             transparentPlayer = Instantiate(transparentPlayerPrefab, solidPlayer.transform.position, solidPlayer.transform.rotation);
@@ -334,5 +337,6 @@ public class PlayerController : MonoBehaviour
         startTime = Time.time;
         solidPlayerAnimator.SetBool("Attack_b", false);
         solidPlayerAnimator.SetBool("Run_b", true);
+        soundManager.Play("Running_1");
     }
 }

@@ -23,6 +23,7 @@ public class SolidPlayer : MonoBehaviour
     // What the heck are we hitting?
     void OnCollisionEnter(Collision collision)
     {
+        FindObjectOfType<SoundManager>().Stop("Running_1");
         if (collision.gameObject.CompareTag("Enemy"))
         {
             currentEnemyHit = collision.gameObject;

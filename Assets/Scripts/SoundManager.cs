@@ -1,5 +1,6 @@
 using UnityEngine.Audio;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class SoundManager : MonoBehaviour
@@ -23,10 +24,27 @@ public class SoundManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    /// <summary>
+    /// Play sound
+    /// </summary>
+    /// <param name="name">Sound to play</param>
     public void Play(string name)
     {
         Sound s = sounds.Find(s => s.name == name);
         if (s != null) s.source.Play();
+    }
+    /// <summary>
+    /// Play sound with a delay first
+    /// </summary>
+    /// <param name="name">Name of sound</param>
+    /// <param name="delay">Time to delay in seconds</param>
+    public void Play(string name, float delay)
+    {
+        Sound s = sounds.Find(s => s.name == name);
+        if(s != null)
+        {
+            StartCoroutine(DelaySound(s, delay));
+        }
     }
 
     public void Stop(string name)
@@ -34,5 +52,11 @@ public class SoundManager : MonoBehaviour
         Sound s = sounds.Find(s => s.name == name);
         
         if(s != null) s.source.Stop();
+    }
+
+    private IEnumerator DelaySound(Sound s, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        s.source.Play();
     }
 }

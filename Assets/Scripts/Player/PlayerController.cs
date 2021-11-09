@@ -204,7 +204,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     void HandleEscapeKey()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.X))
         {
             followPlayerScript.player = solidPlayer;
             currentKey = KeyCode.None;
@@ -307,6 +307,7 @@ public class PlayerController : MonoBehaviour
         if (currentEnergy <= 0 && !gameManager.isGameOver)
         {
             gameManager.isGameOver = true;
+            soundManager.Stop("Running_1");
             solidPlayerAnimator.SetBool("Death_b", true);
             solidPlayerAnimator.SetBool("Run_b", false);
             playerRot.Clear();

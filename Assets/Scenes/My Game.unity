@@ -3433,6 +3433,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7123746368665092694, guid: 355be1193669f33469eced9d7c0ad58b, type: 3}
   m_PrefabInstance: {fileID: 738299917}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &742167227 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7112976485875579492, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
+  m_PrefabInstance: {fileID: 9086374247875961237}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &745799785
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3639,7 +3644,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 790467524}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 917005512}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: Revive
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &790467524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3653,7 +3670,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3978,9 +3995,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isGameOver: 0
+  reviveTax: 10
   introUI: {fileID: 1601654629}
   inGameUI: {fileID: 1253784065}
   endGameUI: {fileID: 829749014}
+  solidPlayer: {fileID: 742167227}
 --- !u!1 &951368442
 GameObject:
   m_ObjectHideFlags: 0
@@ -4904,7 +4923,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -7236,6 +7255,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
+      propertyPath: killCount
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
       propertyPath: energySlider
       value: 
       objectReference: {fileID: 584172912}
@@ -7245,7 +7268,7 @@ PrefabInstance:
       objectReference: {fileID: 951368444}
     - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
       propertyPath: maximumEnergy
-      value: 20
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
       propertyPath: killsCountText

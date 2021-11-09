@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     // Sound manager for the sfx
     SoundManager soundManager;
     // Limits in the x y and z direction for player movement
-    public Vector3 movementLimits;
+    [SerializeField] Vector3 movementLimits;
 
     // Note: The player prefab will be moved after pressing space 
     [SerializeField] GameObject transparentPlayerPrefab;
@@ -25,8 +25,8 @@ public class PlayerController : MonoBehaviour
     private Queue<Quaternion> playerRot;
 
     // Moving solid information
-    [SerializeField] float solidPlayerMoveSpeed;
-    private float originalPlayerMoveSpeed;
+    [SerializeField][Min(0)] float solidPlayerMoveSpeed;
+    [Min(0)] private float originalPlayerMoveSpeed;
     private float journeyLength;
     private float startTime;
     private bool solidIsMoving = false;
@@ -35,13 +35,13 @@ public class PlayerController : MonoBehaviour
     private Coroutine traversalCoroutine;
 
     // Player stats
-    private float currentEnergy;
-    private float movementTraversed;
-    private int killCount;
+    private int currentEnergy;
+    private int movementTraversed;
+    [HideInInspector] public int killCount = 0;
 
     // Player maximums
-    [SerializeField] float maximumEnergy;
-    [SerializeField] int allowedMovement;
+    [SerializeField] [Min(1)] int maximumEnergy;
+    [SerializeField] [Min(1)] int allowedMovement;
 
     // Used to handle different movement types
     private KeyCode currentKey;
@@ -303,6 +303,7 @@ public class PlayerController : MonoBehaviour
     // Check if the player has no energy
     void CheckStats()
     {
+        Debug.Log($"Current: {currentEnergy}");
         // Should only happen once when the energy has gone to 0
         if (currentEnergy <= 0 && !gameManager.isGameOver)
         {
@@ -310,6 +311,7 @@ public class PlayerController : MonoBehaviour
             soundManager.Stop("Running_1");
             solidPlayerAnimator.SetBool("Death_b", true);
             solidPlayerAnimator.SetBool("Run_b", false);
+            currentKey = KeyCode.None;
             playerRot.Clear();
             solidIsMoving = false;
             if (traversalCoroutine != null) StopCoroutine(traversalCoroutine);

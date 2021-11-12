@@ -79,6 +79,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        HandlePause();
         if (!gameManager.isGameOver)
         {
             HandleSolidMovement();
@@ -88,7 +89,7 @@ public class PlayerController : MonoBehaviour
             {
                 HandleMovement();
                 CheckBoundaries();
-                HandleEscapeKey();
+                HandleResetMovement();
                 HandleSingleReturnPress();
             }
         }
@@ -203,7 +204,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Removes the transparent and returns to the solid
     /// </summary>
-    void HandleEscapeKey()
+    void HandleResetMovement()
     {
         if (Input.GetKeyDown(KeyCode.X))
         {
@@ -304,7 +305,6 @@ public class PlayerController : MonoBehaviour
     // Check if the player has no energy
     void CheckStats()
     {
-        Debug.Log($"Current: {currentEnergy}");
         // Should only happen once when the energy has gone to 0
         if (currentEnergy <= 0 && !gameManager.isGameOver)
         {
@@ -343,5 +343,13 @@ public class PlayerController : MonoBehaviour
         solidPlayerAnimator.SetBool("Attack_b", false);
         solidPlayerAnimator.SetBool("Run_b", true);
         soundManager.Play("Running_1");
+    }
+
+    public void HandlePause()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            gameManager.PauseGame();
+        }
     }
 }

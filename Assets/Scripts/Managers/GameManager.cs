@@ -5,11 +5,13 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public bool isGameOver;
-    [SerializeField][Min(0)] int reviveTax;
+    public bool isPaused;
+    [SerializeField] [Min(0)] int reviveTax;
 
     [SerializeField] GameObject introUI;
     [SerializeField] GameObject inGameUI;
     [SerializeField] GameObject endGameUI;
+    [SerializeField] GameObject pauseMenu;
 
     private SoundManager soundManager;
     [SerializeField] GameObject solidPlayer;
@@ -28,9 +30,29 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
-        isGameOver = false;
-        introUI.SetActive(false);
-        inGameUI.SetActive(true);
+        introUI.GetComponent<Animator>().SetBool("Begin_b", true);
+    }
+
+    /// <summary>
+    /// Pause the game and show the menu
+    /// </summary>
+    public void PauseGame()
+    {
+        if (!(endGameUI.activeSelf || introUI.activeSelf))
+        {
+            if (!isPaused)
+            {
+                isGameOver = true;
+                pauseMenu.SetActive(true);
+                inGameUI.SetActive(false);
+                Time.timeScale = 0.0f;
+                isPaused = true;
+            }
+            else
+            {
+                ResumeGame();
+            }
+        }
     }
 
     public void ShowGameoverUI()
@@ -55,5 +77,26 @@ public class GameManager : MonoBehaviour
             solidPlayer.GetComponent<Animator>().SetBool("Recover_b", true);
             solidPlayer.GetComponent<Animator>().SetBool("Death_b", false);
         }
+    }
+
+
+    /// <summary>
+    /// Resumes the game from the pause state
+    /// </summary>
+    public void ResumeGame()
+    {
+        isPaused = false;
+        isGameOver = false;
+        pauseMenu.SetActive(false);
+        inGameUI.SetActive(true);
+        Time.timeScale = 1.0f;
+    }
+
+    public void ShowHeroIntroduction()
+    {
+        introUI.GetComponent<Animator>().SetBool("Begin_b", false);
+        isGameOver = false;
+        introUI.SetActive(false);
+        inGameUI.SetActive(true);
     }
 }

@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
     // Player stats
     private int currentEnergy;
     private int movementTraversed;
-    [HideInInspector] public int killCount = 0;
+    [HideInInspector] public int killCount;
 
     // Player maximums
     [SerializeField] [Min(1)] int maximumEnergy;
@@ -56,6 +56,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         // Set up stats
+        killCount = 0;
         movementTraversed = 0;
         currentKey = KeyCode.None;
         currentEnergy = maximumEnergy;
@@ -72,7 +73,7 @@ public class PlayerController : MonoBehaviour
 
         // Set up UI
         energySlider.maxValue = maximumEnergy;
-        killsCountText.text = "0";
+        killsCountText.text = killCount.ToString();
     }
 
     // Update is called once per frame
@@ -327,8 +328,6 @@ public class PlayerController : MonoBehaviour
 
     public void AttackEnemy()
     {
-        killCount++;
-        killsCountText.text = killCount.ToString();
         solidPlayerMoveSpeed = 0;
         solidPlayerAnimator.SetBool("Attack_b", true);
         solidPlayerAnimator.SetBool("Run_b", false);
@@ -336,6 +335,9 @@ public class PlayerController : MonoBehaviour
     
     public void ContinueRun()
     {
+        killCount++;
+        killsCountText.text = killCount.ToString();
+        FindObjectOfType<SpawnManager>().numberOfEnemies--;
         solidPlayerMoveSpeed = originalPlayerMoveSpeed;
         startTime = Time.time;
         solidPlayerAnimator.SetBool("Attack_b", false);

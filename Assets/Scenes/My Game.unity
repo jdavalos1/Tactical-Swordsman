@@ -2739,6 +2739,18 @@ MonoBehaviour:
     pitch: 1
     name: Z1_Fall_3
     source: {fileID: 0}
+  - clip: {fileID: 8300000, guid: 8c327dcecb81de643875b55aef037150, type: 3}
+    _volume: 0.85
+    _loop: 0
+    pitch: 1
+    name: Glass_Shattering
+    source: {fileID: 0}
+  - clip: {fileID: 8300000, guid: 3a3a90fc14e0206418cb232390219204, type: 3}
+    _volume: 0.8
+    _loop: 0
+    pitch: 1.5
+    name: Healing
+    source: {fileID: 0}
 --- !u!1001 &639788034
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7202,13 +7214,25 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 963194228, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -28.5
+    - target: {fileID: 6505440771820104513, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
+      propertyPath: InitialModule.size3D
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7112976485875869188, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -20.5
+    - target: {fileID: 6505440771820104513, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
+      propertyPath: InitialModule.maxNumParticles
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6505440771820104513, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
+      propertyPath: InitialModule.startSpeed.scalar
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6505440771820104513, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
+      propertyPath: EmissionModule.rateOverTime.scalar
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6505440771820104513, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 9086374248615857636, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
       propertyPath: m_RootOrder
@@ -7255,33 +7279,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
-      propertyPath: killCount
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
       propertyPath: energySlider
       value: 
       objectReference: {fileID: 584172912}
     - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
-      propertyPath: movementText
-      value: 
-      objectReference: {fileID: 951368444}
-    - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
-      propertyPath: maximumEnergy
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
       propertyPath: killsCountText
       value: 
       objectReference: {fileID: 951368444}
-    - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
-      propertyPath: allowedMovement
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 9086374248615857639, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
-      propertyPath: solidPlayerMoveSpeed
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 9086374248615857656, guid: 378b8a61fe306894daffaa29e8c29272, type: 3}
       propertyPath: m_Name
       value: Player

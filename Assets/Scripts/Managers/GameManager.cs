@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject endGameUI;
     [SerializeField] GameObject pauseMenu;
 
+    [SerializeField] GameObject titleUI;
     private SoundManager soundManager;
     [SerializeField] GameObject solidPlayer;
 
@@ -28,7 +29,7 @@ public class GameManager : MonoBehaviour
         soundManager.Play("BGM");
     }
 
-    public void StartGame()
+    public void BeginIntro()
     {
         introUI.GetComponent<Animator>().SetBool("Begin_b", true);
     }
@@ -94,7 +95,12 @@ public class GameManager : MonoBehaviour
 
     public void ShowHeroIntroduction()
     {
+        titleUI.SetActive(false);
         introUI.GetComponent<Animator>().SetBool("Begin_b", false);
+    }
+
+    public void StartGame()
+    {
         isGameOver = false;
         introUI.SetActive(false);
         inGameUI.SetActive(true);

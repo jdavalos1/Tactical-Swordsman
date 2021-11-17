@@ -319,6 +319,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void ReduceScore(int s)
+    {
+        killCount -= s;
+        killsCountText.text = killCount.ToString();
+    }
+
     // Just used to not expose the max energy and energy fields
     public void ResetEnergy()
     {

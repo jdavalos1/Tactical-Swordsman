@@ -70,7 +70,8 @@ public class GameManager : MonoBehaviour
 
         if (pc.killCount >= reviveTax)
         {
-            pc.killCount -= reviveTax;
+            isGameOver = false;
+            pc.ReduceScore(reviveTax);
             pc.ResetEnergy();
             inGameUI.SetActive(true);
             endGameUI.SetActive(false);

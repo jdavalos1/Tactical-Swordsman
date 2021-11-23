@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -12,6 +13,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject inGameUI;
     [SerializeField] GameObject endGameUI;
     [SerializeField] GameObject pauseMenu;
+    [SerializeField] GameObject tutorialUI;
+
+    // Buttons to display after returning to tutorial
+    [SerializeField] GameObject inGameMenuButtons;
 
     [SerializeField] GameObject titleUI;
     private SoundManager soundManager;
@@ -39,6 +44,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void PauseGame()
     {
+        // The tutorial will handle its own esc key press not the pause
+        if (tutorialUI.activeSelf) return;
         if (!(endGameUI.activeSelf || introUI.activeSelf))
         {
             if (!isPaused)
@@ -51,7 +58,11 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                ResumeGame();
+                isPaused = false;
+                isGameOver = false;
+                pauseMenu.SetActive(false);
+                inGameUI.SetActive(true);
+                Time.timeScale = 1.0f;
             }
         }
     }
@@ -62,6 +73,20 @@ public class GameManager : MonoBehaviour
         endGameUI.SetActive(true);
         isGameOver = false;
         endGameUI.GetComponent<Animator>().SetBool("Endgame_b", true);
+    }
+
+    public void ShowTutorialInTitle()
+    {
+        titleUI.SetActive(false);
+        tutorialUI.SetActive(true);
+        tutorialUI.GetComponent<HideTutorial>().returnMenu = titleUI;
+    }
+
+    public void ShowTutorialInGame()
+    {
+        inGameMenuButtons.SetActive(false);
+        tutorialUI.SetActive(true);
+        tutorialUI.GetComponent<HideTutorial>().returnMenu = inGameMenuButtons;
     }
 
     public void Revive()
@@ -81,19 +106,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
-    /// <summary>
-    /// Resumes the game from the pause state
-    /// </summary>
-    public void ResumeGame()
-    {
-        isPaused = false;
-        isGameOver = false;
-        pauseMenu.SetActive(false);
-        inGameUI.SetActive(true);
-        Time.timeScale = 1.0f;
-    }
-
     public void ShowHeroIntroduction()
     {
         titleUI.SetActive(false);
@@ -105,5 +117,10 @@ public class GameManager : MonoBehaviour
         isGameOver = false;
         introUI.SetActive(false);
         inGameUI.SetActive(true);
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
